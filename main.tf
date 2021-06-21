@@ -10,7 +10,8 @@ resource "cloudfoundry_service_instance" "rabbitmq" {
   name  = "tf-rabbitmq-${local.postfix}"
   space = var.cf_space_id
   //noinspection HILUnresolvedReference
-  service_plan = data.cloudfoundry_service.rabbitmq.service_plans[var.plan]
+  service_plan                   = data.cloudfoundry_service.rabbitmq.service_plans[var.plan]
+  replace_on_service_plan_change = true
 }
 
 resource "cloudfoundry_service_key" "key" {
@@ -24,8 +25,11 @@ resource "cloudfoundry_app" "exporter" {
   docker_image = var.exporter_image
   disk_quota   = var.exporter_disk_quota
   memory       = var.exporter_memory
-  environment = merge({},
-  var.exporter_environment)
+  environment = merge({
+    RABBIT_URL      = "https://${cloudfoundry_service_key.key.credentials.hostname}:${cloudfoundry_service_key.key.credentials.management_port}"
+    RABBIT_USER     = cloudfoundry_service_key.key.credentials.username
+    RABBIT_PASSWORD = cloudfoundry_service_key.key.credentials.password
+  }, var.exporter_environment)
 
   //noinspection HCLUnknownBlockType
   routes {
@@ -34,7 +38,7 @@ resource "cloudfoundry_app" "exporter" {
 }
 
 resource "cloudfoundry_route" "exporter" {
-  domain   = data.cloudfoundry_domain.apps_internal_domain
+  domain   = data.cloudfoundry_domain.apps_internal_domain.id
   space    = var.cf_space_id
   hostname = "tf-rabbitmq-exporter-${local.postfix}"
 }
