@@ -27,9 +27,9 @@ resource "cloudfoundry_app" "exporter" {
   memory       = var.exporter_memory
   environment = merge({
     //noinspection HILUnresolvedReference
-    RABBIT_URL      = "https://${cloudfoundry_service_key.key.credentials.hostname}:${cloudfoundry_service_key.key.credentials.management_port}"
+    RABBIT_URL = "https://${cloudfoundry_service_key.key.credentials.hostname}:${cloudfoundry_service_key.key.credentials.management_port}"
     //noinspection HILUnresolvedReference
-    RABBIT_USER     = cloudfoundry_service_key.key.credentials.username
+    RABBIT_USER = cloudfoundry_service_key.key.credentials.username
     //noinspection HILUnresolvedReference
     RABBIT_PASSWORD = cloudfoundry_service_key.key.credentials.password
   }, var.exporter_environment)
