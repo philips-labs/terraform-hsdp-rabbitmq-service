@@ -39,13 +39,12 @@ resource "cloudfoundry_app" "exporter" {
     route = cloudfoundry_route.exporter.id
   }
   labels = {
-    "exporter.prometheus" = true,
-    "exporter.custom" = true,
+    "prometheus.io/exporter" = true,
   }
   annotations = {
-    "exporter.prometheus.group"    = "rabbitmq_exporter"
-    "exporter.prometheus.port"     = "9419"
-    "exporter.prometheus.endpoint" = "/metrics"
+    "prometheus.exporter.group"    = "rabbitmq_exporter"
+    "prometheus.exporter.port"     = "9419"
+    "prometheus.exporter.endpoint" = "/metrics"
   }
 }
 
